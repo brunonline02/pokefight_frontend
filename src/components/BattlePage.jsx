@@ -14,6 +14,11 @@ export default function Battle() {
   const [playerDefense, setPlayerDefense] = useState(null);
   const [playerSpeed, setPlayerSpeed] = useState(null);
   const [opponentHp, setOpponentHp] = useState();
+  const [items, setItems] = useState([
+    { name: "Potion", quantity: 5 },
+    { name: "Increase Attack", quantity: 5 },
+    { name: "Increase Defense", quantity: 5 },
+  ]);
 
   useEffect(() => {
     axios
@@ -87,13 +92,13 @@ export default function Battle() {
       setStatus("You lost!");
       setTimeout(() => {
         window.location.replace("/");
-      }, 3000);
+      }, 2000);
       return;
     } else if (opponentHp <= 0) {
       setStatus("You won!");
       setTimeout(() => {
         window.location.replace("/");
-      }, 3000);
+      }, 2000);
       return;
     } else if (turn % 2 === 0) {
       setTimeout(() => {
@@ -139,18 +144,31 @@ export default function Battle() {
     }
   }, [turn, playerHp, opponentHp]);
 
-  function handleItem(item) {
-    if (item === "potion") {
-      setPlayerHp(playerHp + 20);
-      setStatus(`You used a potion!`);
-    } else if (item === "increase-defense") {
-      setPlayerDefense(playerDefense + 5);
-      setStatus(`You used a defense boost!`);
-    } else if (item === "increase-attack") {
-      setPlayerAttack(playerAttack + 5);
-      setStatus(`You used an attack boost!`);
+  function handleItem(itemName) {
+    const itemIndex = items.findIndex((item) => item.name === itemName);
+    const selected = items[itemIndex];
+    if (selected.quantity === 0) {
+      setStatus(`You don't have any ${itemName} left!`);
+    } else {
+      const newItems = [...items];
+      newItems[itemIndex] = { ...selected, quantity: selected.quantity - 1 };
+      setItems(newItems);
+
+      if (itemName === "Potion") {
+        const newPlayerHp = playerHp + 20;
+        setPlayerHp(newPlayerHp);
+        setStatus(`You used a potion!`);
+      } else if (itemName === "Increase Attack") {
+        const newPlayerAttack = playerAttack + 10;
+        setPlayerAttack(newPlayerAttack);
+        setStatus(`You used an attack boost!`);
+      } else if (itemName === "Increase Defense") {
+        const newPlayerDefense = playerDefense + 10;
+        setPlayerDefense(newPlayerDefense);
+        setStatus(`You used a defense boost!`);
+      }
+      setTurn(turn + 1);
     }
-    setTurn(turn + 1);
   }
 
   const handleRun = () => {
@@ -171,60 +189,114 @@ export default function Battle() {
   };
 
   return (
-    <div className="p-4 bg-gray-900 text-gray-200">
+    <div>
       {playerPokemon && opponentPokemon ? (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-lg font-bold mb-1 text-yellow-300">
-              {playerPokemon.name.english}
-            </h2>
-            <img
-              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${playerPokemon.id}.png`}
-              alt={playerPokemon.name.english}
-              className="mx-auto"
-            />
-            <p className="text-yellow-300">HP: {playerHp}</p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-lg font-bold mb-1 text-yellow-300">
-              {opponentPokemon.name}
-            </h2>
-            <img
-              src={opponentPokemon.sprites.front_default}
-              alt={opponentPokemon.name}
-              className="mx-auto"
-            />
-            <p className="text-yellow-300">HP: {opponentHp}</p>
-          </div>
-          <div className="col-span-2 bg-gray-800 p-4 rounded-lg">
-            <p className="text-yellow-300">Turn: {turn}</p>
-            {status && <p>{status}</p>}
-            <div className="flex justify-around mt-4">
-              <button
-                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
-                onClick={handleAttack}
-              >
-                Attack
-              </button>
-              <div className="dropdown">
-                <label
-                  tabIndex={0}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150  cursor-pointer"
-                >
-                  Items
-                </label>
-                <ul className="dropdown-content menu p-2 bg-yellow-500 hover:bg-yellow-600 text-gray-900 rounded-md shadow-md transition-all duration-150 w-36 gap-4">
-                  <li className="cursor-pointer">Potion</li>
-                  <li className="cursor-pointer">Increase Defense</li>
-                  <li className="cursor-pointer">Increase Attack</li>
-                </ul>
+        <div
+          className="bg-no-repeat bg-center bg-cover h-[40rem] relative w-[85rem]"
+          style={{
+            backgroundImage:
+              "url(https://i.pinimg.com/736x/89/04/3f/89043fb2d56b3583cce79efe1c3fb53d.jpg)",
+          }}
+        >
+          <div className="relative">
+            <div className="absolute top-[250px]  left-[250px] m-4">
+              <h2 className="absolute top-6 text-2xl font-bold text-[white]">
+                {playerPokemon.name.english}
+              </h2>
+              <img
+                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${playerPokemon.id}.png`}
+                alt={playerPokemon.name.english}
+                className="w-96"
+              />
+              <div className="relative">
+                <p className="absolute bottom-72 text-lg font-bold text-[red]">
+                  HP
+                </p>
+                <progress
+                  className="progress w-full absolute bottom-80"
+                  value={playerHp}
+                  max={playerPokemon.base.HP}
+                  color="bg-green-400"
+                />
               </div>
-              <button
-                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
-                onClick={handleRun}
-              >
-                Run
-              </button>
+            </div>
+            <div className="absolute top-[190px] right-[310px]">
+              <h2 className="text-lg absolute bottom-[220px] font-bold text-[white]">
+                {opponentPokemon.name}
+              </h2>
+              <img
+                src={opponentPokemon.sprites.front_default}
+                alt={opponentPokemon.name}
+                className="w-44"
+              />
+              <div className="relative">
+                <p className="absolute bottom-[180px] text-lg font-bold text-[red]">
+                  HP
+                </p>
+                <progress
+                  className="progress w-full absolute bottom-[210px]"
+                  value={opponentHp}
+                  max={
+                    opponentPokemon.stats.find(
+                      (stat) => stat.stat.name === "hp"
+                    ).base_stat
+                  }
+                  color="bg-green-400"
+                />
+              </div>
+            </div>
+            <div className="absolute w-[300px] top-[450px] right-[300px]">
+              <div className="bg-yellow-300 p-4 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-gray-700">Turn: {turn}</p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-gray-700">Status: {status}</p>
+                </div>
+                <div className="flex justify-center items-center mt-4">
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4"
+                    onClick={() => handleAttack()}
+                  >
+                    Attack
+                  </button>
+                  <label
+                    htmlFor="my-modal"
+                    className=" bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4"
+                  >
+                    Items
+                  </label>
+                  <button
+                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
+                    onClick={handleRun}
+                  >
+                    Run
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="checkbox" id="my-modal" className="modal-toggle" />
+          <div className="modal">
+            <div className="modal-box bg-yellow-300 relative">
+              <h2 className="text-lg font-bold mb-4 text-gray-700">
+                Select an Item:
+              </h2>
+              <div className="flex flex-wrap justify-center gap-4">
+                {items.map((item) => (
+                  <label
+                    htmlFor="my-modal"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
+                    key={item.name}
+                    onClick={() => {
+                      handleItem(item.name);
+                    }}
+                    disabled={item.quantity === 0}
+                  >
+                    {item.name} ({item.quantity})
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </div>

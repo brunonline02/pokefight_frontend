@@ -9,16 +9,21 @@ export default function App() {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">All Pokemon</Link>
-            </li>
-          </ul>
+        <nav class="bg-gray-800">
+          <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+            <div class="relative flex items-center justify-between h-16">
+              <div class="flex items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex-shrink-0">
+                  <a href="/" class="text-white font-bold text-xl">
+                    HOME
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
 
         <Routes>
-          <Route path="/pokemon/:id/:info" element={<PokemonInfo />} />
           <Route path="/battle/:id" element={<Battle />} />
           <Route path="/" element={<PokemonSelection />} />
         </Routes>

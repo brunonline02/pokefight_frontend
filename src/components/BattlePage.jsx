@@ -7,7 +7,8 @@ export default function Battle() {
   const [playerPokemon, setPlayerPokemon] = useState(null);
   const [opponentPokemon, setOpponentPokemon] = useState(null);
   const [turn, setTurn] = useState(1);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState("");
+  const [typingIndex, setTypingIndex] = useState(0);
 
   const [playerHp, setPlayerHp] = useState();
   const [playerAttack, setPlayerAttack] = useState(null);
@@ -49,6 +50,17 @@ export default function Battle() {
       .catch((err) => console.error(err));
   }, []);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (typingIndex < status.length) {
+        setTypingIndex((prevTypingIndex) => prevTypingIndex + 1);
+      }
+    }, 50);
+    return () => clearInterval(intervalId);
+  }, [status, typingIndex]);
+
+  const typingStatus = status.substring(0, typingIndex);
+
   const handleAttack = () => {
     const damage = Math.floor(
       Math.floor(
@@ -85,6 +97,7 @@ export default function Battle() {
     }
 
     setTurn(turn + 1);
+    setTypingIndex(0);
   };
 
   useEffect(() => {
@@ -140,8 +153,9 @@ export default function Battle() {
         }
 
         setTurn(turn + 1);
-      }, 2000);
+      }, 4000);
     }
+    setTypingIndex(0);
   }, [turn, playerHp, opponentHp]);
 
   function handleItem(itemName) {
@@ -169,6 +183,7 @@ export default function Battle() {
       }
       setTurn(turn + 1);
     }
+    setTypingIndex(0);
   }
 
   const handleRun = () => {
@@ -180,16 +195,17 @@ export default function Battle() {
       setStatus(`You escaped from ${opponentPokemon.name}!`);
       setTimeout(() => {
         window.location.replace("/");
-      }, 1000);
+      }, 4000);
       return;
     } else {
       setStatus(`You failed to escape from ${opponentPokemon.name}!`);
       setTurn(turn + 1);
     }
+    setTypingIndex(0);
   };
 
   return (
-    <div>
+    <div className="flex items-center justify-center">
       {playerPokemon && opponentPokemon ? (
         <div
           className="bg-no-repeat bg-center bg-cover h-[40rem] relative w-[85rem]"
@@ -199,86 +215,92 @@ export default function Battle() {
           }}
         >
           <div className="relative">
-            <div className="absolute top-[250px]  left-[250px] m-4">
-              <h2 className="absolute top-6 text-2xl font-bold text-[white]">
+            <div className="absolute top-[150px] left-[250px] w-96">
+              <h2 className="relative text-2xl font-bold text-[white]">
                 {playerPokemon.name.english}
               </h2>
+              <progress
+                className="relative progress w-full"
+                value={playerHp}
+                max={playerPokemon.base.HP}
+                color="bg-green-400"
+              />
+
+              <p className="relative text-lg font-bold text-[white]">HP</p>
+
               <img
                 src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${playerPokemon.id}.png`}
                 alt={playerPokemon.name.english}
-                className="w-96"
+                className="relative w-96"
               />
-              <div className="relative">
-                <p className="absolute bottom-72 text-lg font-bold text-[red]">
-                  HP
-                </p>
-                <progress
-                  className="progress w-full absolute bottom-80"
-                  value={playerHp}
-                  max={playerPokemon.base.HP}
-                  color="bg-green-400"
-                />
-              </div>
             </div>
-            <div className="absolute top-[190px] right-[310px]">
-              <h2 className="text-lg absolute bottom-[220px] font-bold text-[white]">
+            <div className="absolute top-[130px] right-[330px] w-44">
+              <h2 className="text-sm relative font-bold text-[white]">
                 {opponentPokemon.name}
               </h2>
+              <progress
+                className="relative progress w-full"
+                value={opponentHp}
+                max={
+                  opponentPokemon.stats.find((stat) => stat.stat.name === "hp")
+                    .base_stat
+                }
+                color="bg-green-400"
+              />
+              <p className="relative text-sm font-bold text-[white]">HP</p>
               <img
                 src={opponentPokemon.sprites.front_default}
                 alt={opponentPokemon.name}
-                className="w-44"
+                className="relative w-44"
               />
-              <div className="relative">
-                <p className="absolute bottom-[180px] text-lg font-bold text-[red]">
-                  HP
-                </p>
-                <progress
-                  className="progress w-full absolute bottom-[210px]"
-                  value={opponentHp}
-                  max={
-                    opponentPokemon.stats.find(
-                      (stat) => stat.stat.name === "hp"
-                    ).base_stat
-                  }
-                  color="bg-green-400"
-                />
-              </div>
             </div>
-            <div className="absolute w-[300px] top-[450px] right-[300px]">
-              <div className="bg-yellow-300 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <p className="text-xs text-gray-700">Turn: {turn}</p>
+            <div className="absolute top-[430px] right-[200px] bg-[#faf0e6] w-[400px] h-[200px] p-4 rounded-lg border-double border-4 border-[#d9b99b]">
+              <div className="h-full flex flex-col">
+                <p className="text-base text-gray-700 text-center">
+                  Turn: {turn}
+                </p>
+                <div className="flex h-[200px] items-center">
+                  <p className="text-base text-gray-700 typing-effect">
+                    {typingStatus}
+                  </p>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-xs text-gray-700">Status: {status}</p>
-                </div>
-                <div className="flex justify-center items-center mt-4">
-                  <button
-                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4"
-                    onClick={() => handleAttack()}
-                  >
-                    Attack
-                  </button>
-                  <label
-                    htmlFor="my-modal"
-                    className=" bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4"
-                  >
-                    Items
-                  </label>
-                  <button
-                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
-                    onClick={handleRun}
-                  >
-                    Run
-                  </button>
+                <div className="h-full flex items-end justify-center">
+                  <div>
+                    <button
+                      className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4 border-double border-4 border-[#d9b99b] hover:border-gray-500"
+                      onClick={() => handleAttack()}
+                      disabled={turn % 2 === 0}
+                    >
+                      Attack
+                    </button>
+                    <label
+                      htmlFor="my-modal"
+                      className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4 cursor-pointer border-double border-4 border-[#d9b99b] hover:border-gray-500"
+                      disabled={turn % 2 === 0}
+                    >
+                      Items
+                    </label>
+                    <button
+                      className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 border-double border-4 border-[#d9b99b] hover:border-gray-500"
+                      onClick={handleRun}
+                      disabled={turn % 2 === 0}
+                    >
+                      Run
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <input type="checkbox" id="my-modal" className="modal-toggle" />
           <div className="modal">
-            <div className="modal-box bg-yellow-300 relative">
+            <div className="relative modal-box bg-[#faf0e6] border-double border-4 border-[#d9b99b] hover:border-gray-500">
+              <label
+                htmlFor="my-modal"
+                className="btn btn-sm btn-circle absolute right-2 top-2 bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 shadow-md transition-all duration-150 border border-1 border-[#d9b99b] hover:border-gray-500"
+              >
+                ✕
+              </label>
               <h2 className="text-lg font-bold mb-4 text-gray-700">
                 Select an Item:
               </h2>
@@ -286,7 +308,7 @@ export default function Battle() {
                 {items.map((item) => (
                   <label
                     htmlFor="my-modal"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150"
+                    className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 border-double border-4 border-[#d9b99b] hover:border-gray-500"
                     key={item.name}
                     onClick={() => {
                       handleItem(item.name);

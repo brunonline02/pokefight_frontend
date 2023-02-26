@@ -35,8 +35,8 @@ export default function PokemonSelection() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold mb-4">Choose Your Pokemon</h1>
-      <div className="flex justify-center mb-4">
+      <h1 className="text-4xl font-bold mb-6 mt-4">Choose Your Pokemon:</h1>
+      <div className="flex justify-center mb-6 mt-6">
         <input
           type="text"
           placeholder="Search by name"
@@ -45,14 +45,14 @@ export default function PokemonSelection() {
           onChange={handleSearch}
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mx-4">
         {filteredPokemons
           .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
           .map((pokemon) => (
             <Link
               key={pokemon.id}
               to={`/battle/${pokemon.id}`}
-              className="bg-white rounded-md overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-150"
+              className="rounded-md overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-150 bg-[#faf0e6] hover:bg-[#eed9c4] border-double border-4 border-[#d9b99b] hover:border-gray-500"
             >
               <div className="h-48 flex items-center justify-center">
                 <img
@@ -61,12 +61,13 @@ export default function PokemonSelection() {
                   className="h-full"
                 />
               </div>
-              <div className="bg-gray-200 py-2 px-4">
-                <h2 className="text-lg font-bold mb-1">
+              <div className="py-2 px-4 bg-[#eed9c4] hover:bg-[#d9b99b]">
+                <h2 className="text-lg font-bold mb-1 text-gray-500">
                   {pokemon.name.english}
                 </h2>
+                <p className="text-gray-800 text-sm">HP: {pokemon.base.HP}</p>
                 <p className="text-gray-800 text-sm">
-                  Base HP: {pokemon.base.HP}
+                  TYPE: {pokemon.type ? pokemon.type.join(", ") : ""}
                 </p>
               </div>
             </Link>

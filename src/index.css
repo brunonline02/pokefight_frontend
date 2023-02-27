@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 @font-face {
-  font-family: "Pokemon"; /*Can be any text*/
+  font-family: "Pokemon";
   src: local("PKMN RBYGSC"),
     url("../public/PKMN\ RBYGSC.ttf") format("truetype");
 }
@@ -42,4 +42,30 @@ body {
   color: gray;
   background-color: #d9b99b;
   border-color: #d9b99b;
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translate(-10px, 0);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate(10px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }

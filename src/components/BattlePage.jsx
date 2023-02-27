@@ -21,6 +21,11 @@ export default function Battle() {
     { name: "Increase Defense", quantity: 5 },
   ]);
 
+  var hitAudio = new Audio("/hit_audio.mp3");
+  var hitAudioOpponent = new Audio("/hit_audio_opponent.mp3");
+  var itemAudio = new Audio("/item_audio.mp3");
+  var runAudio = new Audio("/run_audio.mp3");
+
   useEffect(() => {
     axios
       .get(`http://localhost:3000/pokemon/${id}`)
@@ -55,7 +60,7 @@ export default function Battle() {
       if (typingIndex < status.length) {
         setTypingIndex((prevTypingIndex) => prevTypingIndex + 1);
       }
-    }, 50);
+    }, 10);
     return () => clearInterval(intervalId);
   }, [status, typingIndex]);
 
@@ -90,7 +95,13 @@ export default function Battle() {
           `You dealt ${effectiveDamage} damage to ${opponentPokemon.name}!`
         );
       }
-
+      function hitAnimation(hit) {
+        const elem = document.getElementById("opponent-pokemon");
+        elem.classList.add("shake");
+        setTimeout(() => elem.classList.remove("shake"), 1000);
+      }
+      hitAudio.play();
+      hitAnimation();
       // Calculate opponent's new HP
       const newOpponentHp = opponentHp - effectiveDamage;
       setOpponentHp(newOpponentHp);
@@ -146,12 +157,17 @@ export default function Battle() {
               `${opponentPokemon.name} dealt ${opponentEffectiveDamage} damage to you!`
             );
           }
-
+          function hitAnimation(hit) {
+            const elem = document.getElementById("player-pokemon");
+            elem.classList.add("shake");
+            setTimeout(() => elem.classList.remove("shake"), 1000);
+          }
+          hitAudioOpponent.play();
+          hitAnimation();
           // Calculate opponent's new HP
           const newPlayerHp = playerHp - opponentEffectiveDamage;
           setPlayerHp(newPlayerHp);
         }
-
         setTurn(turn + 1);
       }, 4000);
     }
@@ -167,7 +183,6 @@ export default function Battle() {
       const newItems = [...items];
       newItems[itemIndex] = { ...selected, quantity: selected.quantity - 1 };
       setItems(newItems);
-
       if (itemName === "Potion") {
         const newPlayerHp = playerHp + 20;
         setPlayerHp(newPlayerHp);
@@ -182,6 +197,7 @@ export default function Battle() {
         setStatus(`You used a defense boost!`);
       }
       setTurn(turn + 1);
+      itemAudio.play();
     }
     setTypingIndex(0);
   }
@@ -193,9 +209,10 @@ export default function Battle() {
     const escapeChance = playerSpeed / opponentSpeed;
     if (Math.random() < escapeChance) {
       setStatus(`You escaped from ${opponentPokemon.name}!`);
+      runAudio.play();
       setTimeout(() => {
         window.location.replace("/");
-      }, 4000);
+      }, 2000);
       return;
     } else {
       setStatus(`You failed to escape from ${opponentPokemon.name}!`);
@@ -214,6 +231,10 @@ export default function Battle() {
               "url(https://i.pinimg.com/736x/89/04/3f/89043fb2d56b3583cce79efe1c3fb53d.jpg)",
           }}
         >
+          <audio autoPlay loop>
+            <source src="/trainer_battle.m4a" type="audio/mpeg" />
+            Your browser does not support the audio tag.
+          </audio>
           <div className="relative">
             <div className="absolute top-[150px] left-[250px] w-96">
               <h2 className="relative text-2xl font-bold text-[white]">
@@ -229,6 +250,7 @@ export default function Battle() {
               <p className="relative text-lg font-bold text-[white]">HP</p>
 
               <img
+                id="player-pokemon"
                 src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${playerPokemon.id}.png`}
                 alt={playerPokemon.name.english}
                 className="relative w-96"
@@ -249,6 +271,7 @@ export default function Battle() {
               />
               <p className="relative text-sm font-bold text-[white]">HP</p>
               <img
+                id="opponent-pokemon"
                 src={opponentPokemon.sprites.front_default}
                 alt={opponentPokemon.name}
                 className="relative w-44"

@@ -6,8 +6,9 @@ import ReactPaginate from "react-paginate";
 export default function PokemonSelection() {
   const [pokemonList, setPokemonList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
 
   useEffect(() => {
     axios
@@ -17,13 +18,17 @@ export default function PokemonSelection() {
   }, []);
 
   const filteredPokemons = pokemonList.filter((pokemon) => {
-    return pokemon.name.english
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const nameMatch = pokemon.name.english.toLowerCase().includes(searchTerm);
+    const typeMatch = pokemon.type.some((type) =>
+      type.toLowerCase().includes(searchType)
+    );
+    return nameMatch || typeMatch;
   });
 
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+    const value = event.target.value.toLowerCase();
+    setSearchTerm(value);
+    setSearchType(value);
     setCurrentPage(0);
   };
 
@@ -39,9 +44,9 @@ export default function PokemonSelection() {
       <div className="flex justify-center mb-6 mt-6">
         <input
           type="text"
-          placeholder="Search by name"
+          placeholder="Search by name or type"
           className="border border-gray-300 rounded-md py-2 px-4 w-80"
-          value={searchTerm}
+          value={searchTerm || searchType}
           onChange={handleSearch}
         />
       </div>

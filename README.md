@@ -1,6 +1,6 @@
 # pokefight_frontend
 
-Welcome to the frontend repository for the turn-based Pokemon game inspired by the Gameboy games! This frontend was built using React and serves as the interface for the game, while the backend is handled by the companion project at https://github.com/brunonline02/Portfolio_backend.
+Welcome to the frontend repository for the turn-based Pokemon game inspired by the Gameboy games! This frontend was built using React and serves as the interface for the game, while the backend is handled by the companion project at https://github.com/brunonline02/pokefight_backend.
 
 ### Getting Started
 

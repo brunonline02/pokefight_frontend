@@ -8,6 +8,7 @@ export default function Battle() {
   const [opponentPokemon, setOpponentPokemon] = useState(null);
   const [turn, setTurn] = useState(1);
   const [status, setStatus] = useState("");
+  const [run, setRun] = useState(false);
   const [typingIndex, setTypingIndex] = useState(0);
 
   const [playerHp, setPlayerHp] = useState();
@@ -210,9 +211,10 @@ export default function Battle() {
     if (Math.random() < escapeChance) {
       setStatus(`You escaped from ${opponentPokemon.name}!`);
       runAudio.play();
+      setRun(true);
       setTimeout(() => {
         window.location.replace("/");
-      }, 2000);
+      }, 3000);
       return;
     } else {
       setStatus(`You failed to escape from ${opponentPokemon.name}!`);
@@ -292,21 +294,36 @@ export default function Battle() {
                     <button
                       className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4 border-double border-4 border-[#d9b99b] hover:border-gray-500"
                       onClick={() => handleAttack()}
-                      disabled={turn % 2 === 0}
+                      disabled={
+                        turn % 2 === 0 ||
+                        playerHp <= 0 ||
+                        opponentHp <= 0 ||
+                        run === true
+                      }
                     >
                       Attack
                     </button>
                     <label
                       htmlFor="my-modal"
                       className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 mr-4 cursor-pointer border-double border-4 border-[#d9b99b] hover:border-gray-500"
-                      disabled={turn % 2 === 0}
+                      disabled={
+                        turn % 2 === 0 ||
+                        playerHp <= 0 ||
+                        opponentHp <= 0 ||
+                        run === true
+                      }
                     >
                       Items
                     </label>
                     <button
                       className="btn bg-[#eed9c4] hover:bg-[#d9b99b] text-gray-900 px-4 py-2 rounded-md shadow-md transition-all duration-150 border-double border-4 border-[#d9b99b] hover:border-gray-500"
                       onClick={handleRun}
-                      disabled={turn % 2 === 0}
+                      disabled={
+                        turn % 2 === 0 ||
+                        playerHp <= 0 ||
+                        opponentHp <= 0 ||
+                        run === true
+                      }
                     >
                       Run
                     </button>

@@ -3,8 +3,7 @@
 @tailwind utilities;
 @font-face {
   font-family: "Pokemon";
-  src: local("PKMN RBYGSC"),
-    url("../public/PKMN\ RBYGSC.ttf") format("truetype");
+  src: local("PKMN RBYGSC"), url("/PKMN\ RBYGSC.ttf") format("truetype");
 }
 
 body {

@@ -12,7 +12,7 @@ export default function PokemonSelection() {
 
   useEffect(() => {
     axios
-      .get("pokefightbackend-production.up.railway.app/pokemon")
+      .get("https://pokefightbackend-production.up.railway.app/pokemon")
       .then((res) => setPokemonList(res.data))
       .catch((err) => console.error(err));
   }, []);

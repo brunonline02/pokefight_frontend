@@ -29,7 +29,7 @@ export default function Battle() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/pokemon/${id}`)
+      .get(`pokefightbackend-production.up.railway.app/pokemon/${id}`)
       .then((res) => {
         setPlayerPokemon(res.data);
         setPlayerHp(res.data.base.HP);

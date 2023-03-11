@@ -11,10 +11,18 @@ export default function PokemonSelection() {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    axios
-      .get("https://pokefightbackend-production.up.railway.app/pokemon")
-      .then((res) => setPokemonList(res.data))
-      .catch((err) => console.error(err));
+    const fetchAllPokemon = async () => {
+      try {
+        const res = await axios.get(
+          // `http://localhost:3000/pokemon`
+          `https://pokefightbackend-production.up.railway.app/pokemon`
+        );
+        setPokemonList(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchAllPokemon();
   }, []);
 
   const filteredPokemons = pokemonList.filter((pokemon) => {

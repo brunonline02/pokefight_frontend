@@ -28,32 +28,42 @@ export default function Battle() {
   var runAudio = new Audio("/run_audio.mp3");
 
   useEffect(() => {
-    axios
-      .get(`pokefightbackend-production.up.railway.app/pokemon/${id}`)
-      .then((res) => {
+    const fetchPlayerPokemon = async () => {
+      try {
+        const res = await axios.get(
+          // `http://localhost:3000/pokemon/${id}`
+          `https://pokefightbackend-production.up.railway.app/pokemon/${id}`
+        );
         setPlayerPokemon(res.data);
         setPlayerHp(res.data.base.HP);
         setPlayerAttack(res.data.base.Attack);
         setPlayerDefense(res.data.base.Defense);
         setPlayerSpeed(res.data.base.Speed);
-      })
-      .catch((err) => console.error(err));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPlayerPokemon();
   }, [id]);
 
   useEffect(() => {
-    axios
-      .get("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
-      .then((res) => {
-        const randomIndex = Math.floor(Math.random() * res.data.results.length);
-        return axios.get(res.data.results[randomIndex].url);
-      })
-      .then((res) => {
-        setOpponentPokemon(res.data);
-        setOpponentHp(
-          res.data.stats.find((stat) => stat.stat.name === "hp").base_stat
+    const fetchOpponentPokemon = async () => {
+      try {
+        const res = await axios.get(
+          "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
         );
-      })
-      .catch((err) => console.error(err));
+        const randomIndex = Math.floor(Math.random() * res.data.results.length);
+        const opponentData = await axios.get(res.data.results[randomIndex].url);
+        setOpponentPokemon(opponentData.data);
+        setOpponentHp(
+          opponentData.data.stats.find((stat) => stat.stat.name === "hp")
+            .base_stat
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchOpponentPokemon();
   }, []);
 
   useEffect(() => {
@@ -68,18 +78,18 @@ export default function Battle() {
   const typingStatus = status.substring(0, typingIndex);
 
   const handleAttack = () => {
-    const damage = Math.floor(
+    const damage =
       Math.floor(
-        (Math.floor(2 / 5 + 2) * playerAttack * playerSpeed) /
-          opponentPokemon.stats.find((stat) => stat.stat.name === "defense")
-            .base_stat /
-          50
-      ) + 2
-    );
+        Math.floor(
+          (Math.floor(2 / 5 + 2) * playerAttack * playerSpeed) /
+            opponentPokemon.stats.find((stat) => stat.stat.name === "defense")
+              .base_stat
+        ) / 50
+      ) + 2;
 
     // Chance of missing attack
     const hitChance = Math.floor(Math.random() * 100);
-    if (hitChance < 25) {
+    if (hitChance < 10) {
       setStatus(`You missed your attack!`);
     } else {
       // Critical hit chance
@@ -141,7 +151,7 @@ export default function Battle() {
 
         // Chance of missing attack
         const hitChance = Math.floor(Math.random() * 100);
-        if (hitChance < 25) {
+        if (hitChance < 10) {
           setStatus(`${opponentPokemon.name} missed the attack!`);
         } else {
           // Critical hit chance

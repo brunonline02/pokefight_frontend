@@ -15,7 +15,7 @@ export default function PokemonSelection() {
       try {
         const res = await axios.get(
           // `http://localhost:3000/pokemon`
-          `https://pokefightbackend-production.up.railway.app/pokemon`
+          `https://pokefightbackend-production.up.railway.app/pokemon`,
         );
         setPokemonList(res.data);
       } catch (error) {
@@ -28,7 +28,7 @@ export default function PokemonSelection() {
   const filteredPokemons = pokemonList.filter((pokemon) => {
     const nameMatch = pokemon.name.english.toLowerCase().includes(searchTerm);
     const typeMatch = pokemon.type.some((type) =>
-      type.toLowerCase().includes(searchType)
+      type.toLowerCase().includes(searchType),
     );
     return nameMatch || typeMatch;
   });
